@@ -1,11 +1,13 @@
 package db.tables.opponent;
 
+import db.QueryUtils;
 import db.table.DBColumn;
 import db.table.DBTable;
 import db.table.DBTableItem;
 import db.table.DbColumnValue;
 
 import java.sql.*;
+import java.util.*;
 
 public class DBOpponent extends DBTable {
     private DBColumn<Integer> idOpponent = new DBColumn<>("id_opponent", 1);
@@ -25,19 +27,24 @@ public class DBOpponent extends DBTable {
     public DBColumn<String> getNameImage() {
         return nameImage;
     }
-    @Override
-    public <T extends DBTable> int insert(Connection connection, DBTableItem<T> dbTableItem) throws SQLException {
-        int insertId = -1;
 
-        if (dbTableItem instanceof DBOpponentItem item) {
-            String query = getInsertQuery(connection);
-            PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+    @Override
+    protected <T extends DBTable> PreparedStatement generatePreparedStatement(Connection connection, String query, DBTableItem<T> dbTableItem) throws SQLException {
+        PreparedStatement ps = null;
+
+          if (dbTableItem instanceof DBOpponentItem item) {
+            ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
             int offset = 0;
             DbColumnValue<?> columnValue;
-            if (isThereAutoIncrement()) {
+
+            // Проверяем, есть ли auto_increment
+            if (!isThereAutoIncrement()) {
+                // Если нет, то мы должны добавить параметр в начало запроса (туда будет сохраняться указанный id)
                 columnValue = item.getIdOpponent();
                 ps.setObject(columnValue.getDbColumn().getIndex(), columnValue.getValue());
+            } else {
+                // Если есть, параметр не нужен, указываем смещение всех параметров на 1
                 offset = 1;
             }
 
@@ -46,23 +53,61 @@ public class DBOpponent extends DBTable {
 
             columnValue = item.getNameImage();
             ps.setObject(columnValue.getDbColumn().getIndex() - offset, columnValue.getValue());
-
-            ps.executeUpdate();
-            ResultSet rs = ps.getGeneratedKeys();
-            if (rs.next()) {
-                insertId = rs.getInt(1);
-            }
         }
 
-        return insertId;
+        return ps;
     }
     @Override
-    public <T extends DBTable> int update(Connection connection, DBTableItem<T> dbTableItem) throws SQLException {
-        return 0;
-    }
+    protected <T extends DBTable> String generateUpdateQuery(DBTableItem<T> dbTableItem) {
+        String query = null;
 
+        if (dbTableItem instanceof DBOpponentItem item) {
+            /* Создаем мапу, которая будет сортировать SET выражения по индексу колонок
+                Это необходимо, чтобы корректно вставить будущие параметры */
+            Map<Integer, String> updateSetItems = new TreeMap<>();
+
+            DBColumn<?> dbColumn;
+            String updateSetItem;
+            if (!isThereAutoIncrement()) {
+                // Если нет auto-increment, добавляем параметр изменения id в начало выражения SET
+                dbColumn = idOpponent;
+                updateSetItem = QueryUtils.getUpdateSetItem(dbColumn.getColumnName());
+                updateSetItems.put(dbColumn.getIndex(), updateSetItem);
+            }
+
+            /* Нужно добавить все поля таблицы в мапу, чтобы собрать запрос изменения
+                (Поля id, name и так далее)*/
+            dbColumn = nameImage;
+            /* Генерируем SET выражение, которое в будущем будем объединять с остальными через запятую
+                Генерируется: <название_колонки> = ? (? - параметр для вставки значения, используется в PreparedStatement)*/
+            updateSetItem = QueryUtils.getUpdateSetItem(dbColumn.getColumnName());
+            updateSetItems.put(dbColumn.getIndex(), updateSetItem);
+
+            dbColumn = name;
+            updateSetItem = QueryUtils.getUpdateSetItem(dbColumn.getColumnName());
+            updateSetItems.put(dbColumn.getIndex(), updateSetItem);
+
+            /* Собираем полученную мапу и разделяем запятыми
+                Получится общее выражение SET с */
+            String updateSetItemsStr = String.join(", ", updateSetItems.values());
+            query = "UPDATE %s SET %s WHERE %s IN (%s)";
+            query = String.format(query, getTableName(), updateSetItemsStr,
+                    idOpponent.getColumnName(), item.getIdOpponent().getOldValue());
+        }
+
+        return query;
+    }
     @Override
-    public <T extends DBTable> int delete(Connection connection, DBTableItem<T> dbTableItem) throws SQLException {
-        return 0;
+    protected <T extends DBTable> String generateDeleteQuery(DBTableItem<T> dbTableItem) {
+        String query = null;
+
+        if (dbTableItem instanceof DBOpponentItem item) {
+            // Удаляем строку с указанным id переданного dbTableItem
+            query = "DELETE FROM %s WHERE %s IN (%s)";
+            query = String.format(query, getTableName(),
+                    idOpponent.getColumnName(), item.getIdOpponent().getValue());
+        }
+
+        return query;
     }
 }

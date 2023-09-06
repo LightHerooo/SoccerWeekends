@@ -1,6 +1,7 @@
 package gui.versus.games.add_game;
 
 import db.DBConnect;
+import db.QueryUtils;
 import db.table.DBTable;
 import db.tables.game.DBGame;
 import db.tables.game.DBGameItem;
@@ -10,7 +11,7 @@ import db.tables.game_type.DBGameType;
 import db.tables.game_type.DBGameTypeItem;
 import javafx.FXMLController;
 import javafx.Stageable;
-import gui.versus.games.add_game.add_opponent_result.AddOpponentResult;
+import gui.versus.games.add_game.opponent_game_result.OpponentGameResult;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -26,7 +27,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class AddGameController implements Initializable, FXMLController, Stageable {
@@ -39,9 +42,11 @@ public class AddGameController implements Initializable, FXMLController, Stageab
     @FXML
     private DatePicker dpGameDate;
     @FXML
-    private ListView<AddOpponentResult> lvAddOpponentResults;
+    private ListView<OpponentGameResult> lvOpponentGameResults;
     @FXML
-    private Button btnAddNewOpponentResult;
+    private Button btnDeleteOpponentGameResult;
+    @FXML
+    private Button btnAddOpponentGameResult;
     @FXML
     private Button btnCancel;
     @FXML
@@ -73,8 +78,8 @@ public class AddGameController implements Initializable, FXMLController, Stageab
             }
             dpGameDate.setValue(LocalDate.now());
 
-            btnAddNewOpponentResult_click(null);
-            btnAddNewOpponentResult_click(null);
+            btnAddOpponentResult_click(null);
+            btnAddOpponentResult_click(null);
         } else { // Если игра уже существует - изменяем
             // Устанавливаем тип игры
             try (Connection connection = DBConnect.getConnection()) {
@@ -103,8 +108,8 @@ public class AddGameController implements Initializable, FXMLController, Stageab
                         dbGameItem.getIdGame().getValue());
                 while (rs.next()) {
                     DBGameResultItem item = new DBGameResultItem(rs);
-                    AddOpponentResult aor = new AddOpponentResult(item);
-                    lvAddOpponentResults.getItems().add(aor);
+                    OpponentGameResult aor = new OpponentGameResult(item);
+                    lvOpponentGameResults.getItems().add(aor);
                 }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -112,18 +117,17 @@ public class AddGameController implements Initializable, FXMLController, Stageab
         }
 
         // Привязываем к Node-ам их события
-        btnAddNewOpponentResult.setOnAction(this::btnAddNewOpponentResult_click);
+        btnDeleteOpponentGameResult.setOnAction(this::btnDeleteOpponentGameResult_click);
+        btnAddOpponentGameResult.setOnAction(this::btnAddOpponentResult_click);
         btnCancel.setOnAction(this::btnCancel_click);
         btnSave.setOnAction(this::btnSave_click);
     }
-
     @Override
     public FXMLLoader getLoader() throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("AddGame.fxml"));
         loader.setController(this);
         return loader;
     }
-
     @Override
     public Pane getMainPane() {
         return mainPane;
@@ -144,9 +148,16 @@ public class AddGameController implements Initializable, FXMLController, Stageab
         return stage;
     }
 
-    private void btnAddNewOpponentResult_click(ActionEvent actionEvent) {
-        AddOpponentResult aor = new AddOpponentResult(new DBGameResultItem());
-        lvAddOpponentResults.getItems().add(aor);
+    private void btnDeleteOpponentGameResult_click(ActionEvent actionEvent) {
+        OpponentGameResult ogr = lvOpponentGameResults.getSelectionModel().getSelectedItem();
+        if (ogr != null) {
+            lvOpponentGameResults.getItems().remove(ogr);
+        }
+    }
+
+    private void btnAddOpponentResult_click(ActionEvent actionEvent) {
+        OpponentGameResult ogr = new OpponentGameResult(new DBGameResultItem());
+        lvOpponentGameResults.getItems().add(ogr);
     }
 
     private void btnSave_click(ActionEvent actionEvent) {
@@ -169,10 +180,10 @@ public class AddGameController implements Initializable, FXMLController, Stageab
         }
 
         HashSet<String> opponentNames = new HashSet<>();
-        for (AddOpponentResult aor: lvAddOpponentResults.getItems()) {
-            opponentNames.add(aor.getController().getSelectedOpponentItem().getName().getValue());
+        for (OpponentGameResult ogr: lvOpponentGameResults.getItems()) {
+            opponentNames.add(ogr.getController().getSelectedOpponentItem().getName().getValue());
         }
-        if (opponentNames.size() != lvAddOpponentResults.getItems().size()) {
+        if (opponentNames.size() != lvOpponentGameResults.getItems().size()) {
             errorItemIndex++;
             errorItems.append(String.format(errorItemPattern, errorItemIndex,
                     "Участники не должны повторяться"));
@@ -187,18 +198,20 @@ public class AddGameController implements Initializable, FXMLController, Stageab
             alert.setContentText(errorMessage.toString());
             alert.show();
         } else {
+            dbGameItem.getIdGameType().setValue(gti.getIdGameType().getValue());
+            dbGameItem.getGameDate().setValue(d);
+
+            // Если игра новая - добавляем
             if (dbGameItem.getIdGame().getValue() == null) {
                 try (Connection connection = DBConnect.getConnection();) {
-                    dbGameItem.getIdGameType().setValue(gti.getIdGameType().getValue());
-                    dbGameItem.getGameDate().setValue(d);
-
                     // Добавляем игру в БД
                     DBTable table = new DBGame();
                     int gameId = table.insert(connection, dbGameItem);
 
+                    // Добавляем результаты игры
                     table = new DBGameResult();
-                    for (AddOpponentResult aor: lvAddOpponentResults.getItems()) {
-                        DBGameResultItem item = aor.getController().getDbGameResultItem();
+                    for (OpponentGameResult ogr: lvOpponentGameResults.getItems()) {
+                        DBGameResultItem item = ogr.getController().getDbGameResultItem();
                         item.getIdGame().setValue(gameId);
                         table.insert(connection, item);
                     }
@@ -208,7 +221,50 @@ public class AddGameController implements Initializable, FXMLController, Stageab
                     throw new RuntimeException(e);
                 }
             } else {
+                // Если игра не новая - изменяем
+                try (Connection connection = DBConnect.getConnection();) {
+                    // Изменяем игру в БД
+                    DBGame gameTable = new DBGame();
+                    gameTable.update(connection, dbGameItem);
+                    int gameId = dbGameItem.getIdGame().getValue();
 
+                    // Добавляем/изменяем результаты игр
+                    DBGameResult gameResultTable = new DBGameResult();
+                    List<Integer> griIds = new ArrayList<>();
+                    for (OpponentGameResult ogr: lvOpponentGameResults.getItems()) {
+                        DBGameResultItem item = ogr.getController().getDbGameResultItem();
+                        item.getIdGame().setValue(gameId);
+                        int griId = -1;
+                        if (item.getIdGameResult().getValue() == null) {
+                            griId = gameResultTable.insert(connection, item);
+                        } else {
+                            gameResultTable.update(connection, item);
+                            griId = item.getIdGameResult().getValue();
+                        }
+                        griIds.add(griId);
+                    }
+
+                    // Удаляем результаты, которые были удалены пользователем
+                    String parametersStr = QueryUtils.getParametersStr(griIds.size());
+                    String query = "SELECT * FROM %s WHERE %s IN (%s) AND %s NOT IN (%s)";
+                    query = String.format(query, gameResultTable.getTableName(), gameResultTable.getIdGame().getColumnName(),
+                            gameId, gameResultTable.getIdGameResult().getColumnName(), parametersStr);
+
+                    PreparedStatement ps = connection.prepareStatement(query);
+                    for (int i = 0; i < griIds.size(); i++) {
+                        ps.setObject(i + 1, griIds.get(i));
+                    }
+
+                    ResultSet rs = ps.executeQuery();
+                    if (rs.next()) {
+                        DBGameResultItem item = new DBGameResultItem(rs);
+                        gameResultTable.delete(connection, item);
+                    }
+
+                    btnCancel_click(null);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }

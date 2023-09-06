@@ -11,4 +11,10 @@ public class QueryUtils {
 
         return String.join(",", parameters);
     }
+
+    public static String getUpdateSetItem(String columnName) {
+        String parametersStr = getParametersStr(1);
+        String updateSetItemPattern = "%s = %s";
+        return String.format(updateSetItemPattern, columnName, parametersStr);
+    }
 }

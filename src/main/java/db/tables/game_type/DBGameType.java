@@ -4,6 +4,7 @@ import db.table.DBColumn;
 import db.table.DBTable;
 import db.table.DBTableItem;
 import db.table.DbColumnValue;
+import db.tables.opponent.DBOpponentItem;
 
 import java.sql.*;
 
@@ -22,40 +23,35 @@ public class DBGameType extends DBTable {
     }
 
     @Override
-    public <T extends DBTable> int insert(Connection connection, DBTableItem<T> dbTableItem) throws SQLException {
-        int insertId = -1;
+    protected <T extends DBTable> PreparedStatement generatePreparedStatement(Connection connection, String query, DBTableItem<T> dbTableItem) throws SQLException {
+        PreparedStatement ps = null;
 
         if (dbTableItem instanceof DBGameTypeItem item) {
-            String query = getInsertQuery(connection);
-            PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
             int offset = 0;
             DbColumnValue<?> columnValue;
-            if (isThereAutoIncrement()) {
+            if (!isThereAutoIncrement()) {
                 columnValue = item.getIdGameType();
                 ps.setObject(columnValue.getDbColumn().getIndex(), columnValue.getValue());
+            } else {
                 offset = 1;
             }
 
             columnValue = item.getTitle();
             ps.setObject(columnValue.getDbColumn().getIndex() - offset, columnValue.getValue());
-
-            ps.executeUpdate();
-            ResultSet rs = ps.getGeneratedKeys();
-            if (rs.next()) {
-                insertId = rs.getInt(1);
-            }
         }
 
-        return insertId;
-    }
-    @Override
-    public <T extends DBTable> int update(Connection connection, DBTableItem<T> dbTableItem) throws SQLException {
-        return 0;
+        return ps;
     }
 
     @Override
-    public <T extends DBTable> int delete(Connection connection, DBTableItem<T> dbTableItem) throws SQLException {
-        return 0;
+    protected <T extends DBTable> String generateUpdateQuery(DBTableItem<T> dbTableItem) {
+        return null;
+    }
+
+    @Override
+    protected <T extends DBTable> String generateDeleteQuery(DBTableItem<T> dbTableItem) {
+        return null;
     }
 }

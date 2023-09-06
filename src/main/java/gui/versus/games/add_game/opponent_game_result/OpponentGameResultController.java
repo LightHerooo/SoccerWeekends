@@ -1,4 +1,4 @@
-package gui.versus.games.add_game.add_opponent_result;
+package gui.versus.games.add_game.opponent_game_result;
 
 import db.DBConnect;
 import db.tables.game_result.DBGameResultItem;
@@ -19,7 +19,7 @@ import java.net.URL;
 import java.sql.*;
 import java.util.ResourceBundle;
 
-public class AddOpponentResultController implements Initializable, FXMLController {
+public class OpponentGameResultController implements Initializable, FXMLController {
     private DBGameResultItem dbGameResultItem;
 
     @FXML
@@ -29,7 +29,7 @@ public class AddOpponentResultController implements Initializable, FXMLControlle
     @FXML
     private Spinner<Integer> spScore;
 
-    public AddOpponentResultController(DBGameResultItem dbGameResultItem) {
+    public OpponentGameResultController(DBGameResultItem dbGameResultItem) {
         this.dbGameResultItem = dbGameResultItem;
     }
 
@@ -75,12 +75,11 @@ public class AddOpponentResultController implements Initializable, FXMLControlle
             int score = dbGameResultItem.getScore().getValue();
             spScore.getValueFactory().setValue((score < minValue || score > maxValue) ? minValue : score);
         }
-
     }
 
     @Override
     public FXMLLoader getLoader() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("AddOpponentResult.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("OpponentGameResult.fxml"));
         loader.setController(this);
         return loader;
     }

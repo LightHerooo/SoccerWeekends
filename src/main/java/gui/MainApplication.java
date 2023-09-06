@@ -2,6 +2,7 @@ package gui;
 
 import db.DBConnect;
 import db.table.DBColumn;
+import db.table.DBTable;
 import db.tables.game_result.DBGameResultItem;
 import db.tables.opponent.DBOpponent;
 import db.tables.opponent.DBOpponentItem;
@@ -12,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public final class MainApplication extends Application {
@@ -26,8 +28,29 @@ public final class MainApplication extends Application {
         JavaFXUtils.setZeroAnchors(p); // Устанавливаем отступы AnchorPane по 0 (нужно для растягивания на всё окно)
         Scene sc = new Scene(p);
 
+        //DBPOLYGON();
+
         stage.setScene(sc);
         stage.show();
+    }
 
+    private void DBPOLYGON() {
+        try(Connection connection = DBConnect.getConnection();) {
+            DBOpponent table = new DBOpponent();
+
+            DBOpponentItem item = new DBOpponentItem();
+            item.getName().setValue("CS2");
+            table.insert(connection, item);
+            /*ResultSet rs = table.selectWithOneParameter(connection, table.getIdOpponent(), 7);
+            if (rs.next()) {
+                DBOpponentItem item = new DBOpponentItem(rs);
+                table.delete(connection, item);
+            }*/
+
+            /*DBOpponentItem item = item.getName().setValue("NOOOOOOO");
+            table.update(connection, item);*/
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

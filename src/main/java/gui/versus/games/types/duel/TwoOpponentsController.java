@@ -49,7 +49,8 @@ public class TwoOpponentsController implements Initializable, FXMLController {
             DBGameResult table = new DBGameResult();
             ResultSet rs = table.selectWithOneParameter(connection, table.getIdGame(),
                     dbGameItem.getIdGame().getValue());
-            while (rs.next() || gris.size() < MAX_NUMBER_OF_OPPONENTS) {
+            while (rs.next()) {
+                if (gris.size() == MAX_NUMBER_OF_OPPONENTS) break;
                 DBGameResultItem item = new DBGameResultItem(rs);
                 gris.add(item);
             }

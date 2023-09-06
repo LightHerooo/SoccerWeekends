@@ -36,9 +36,14 @@ public class OpponentController implements Initializable, FXMLController {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        String imgPath = "opponent_images/%s";
-        imgPath = String.format(imgPath, DBOpponentItem.getNameImage().getValue());
+        String imgPathPattern = "opponent_images/%s";
+        String imgPath = String.format(imgPathPattern, DBOpponentItem.getNameImage().getValue());
         URL resource = getClass().getClassLoader().getResource(imgPath);
+        if (resource == null) {
+            imgPath = String.format(imgPathPattern, "unknown.png");
+            resource = getClass().getClassLoader().getResource(imgPath);
+        }
+
         try {
             File f = new File(resource.toURI());
             try (FileInputStream fis = new FileInputStream(f)) {

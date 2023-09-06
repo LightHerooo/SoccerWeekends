@@ -3,7 +3,6 @@ package db.table;
 import db.QueryUtils;
 
 import java.sql.*;
-import java.util.ArrayList;
 
 public abstract class DBTable{
     private String tableName;
@@ -53,13 +52,16 @@ public abstract class DBTable{
     }
 
     // Вывод значений с одним условием
-    public <R> ResultSet selectWithOneParameter(Connection connection, DBColumn<R> dbColumn, R value) {
+    public <T> ResultSet selectWithOneParameter(Connection connection, DBColumn<T> dbColumn, T... value) {
         ResultSet rs = null;
         try {
-            String query = "SELECT * FROM %s WHERE %s = ?";
-            query = String.format(query, tableName, dbColumn.getColumnName());
+            String parametersStr = QueryUtils.getParametersStr(value.length);
+            String query = "SELECT * FROM %s WHERE %s IN (%s)";
+            query = String.format(query, tableName, dbColumn.getColumnName(), parametersStr);
             PreparedStatement st = connection.prepareStatement(query);
-            st.setObject(1, value);
+            for (int i = 0; i < value.length; i++) {
+                st.setObject(i + 1, value[i]);
+            }
             st.execute();
 
             rs = st.getResultSet();
@@ -70,16 +72,39 @@ public abstract class DBTable{
         return rs;
     }
 
-    public String getInsertQuery(Connection connection) {
+    // Генерация запроса с параметрами, установка значений DBTableItem-а в запрос.
+    protected abstract <T extends DBTable> PreparedStatement generatePreparedStatement(Connection connection, String query, DBTableItem<T> dbTableItem) throws SQLException;
+    protected abstract <T extends DBTable> String generateUpdateQuery(DBTableItem<T> dbTableItem);
+    protected abstract <T extends DBTable> String generateDeleteQuery(DBTableItem<T> dbTableItem);
+
+    public <T extends DBTable> int insert(Connection connection, DBTableItem<T> dbTableItem) throws SQLException {
         int numberOfColumns = getNumberOfColumns(connection);
         if (isThereAutoIncrement()) numberOfColumns--;
 
         String parametersStr = QueryUtils.getParametersStr(numberOfColumns);
         String query = "INSERT INTO %s VALUES (%s)";
-        return String.format(query, tableName, parametersStr);
-    }
+        query = String.format(query, tableName, parametersStr);
 
-    public abstract <T extends DBTable> int insert(Connection connection, DBTableItem<T> dbTableItem) throws SQLException;
-    public abstract <T extends DBTable> int update(Connection connection, DBTableItem<T> dbTableItem) throws SQLException;
-    public abstract <T extends DBTable> int delete(Connection connection, DBTableItem<T> dbTableItem) throws SQLException;
+        int insertId = -1;
+        PreparedStatement ps = generatePreparedStatement(connection, query, dbTableItem);
+        if (ps != null) {
+            ps.executeUpdate();
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                insertId = rs.getInt(1);
+            }
+        }
+
+        return insertId;
+    };
+    public <T extends DBTable> void update(Connection connection, DBTableItem<T> dbTableItem) throws SQLException {
+        String query = generateUpdateQuery(dbTableItem);
+        PreparedStatement ps = generatePreparedStatement(connection, query, dbTableItem);
+        ps.executeUpdate();
+    }
+    public <T extends DBTable> void delete(Connection connection, DBTableItem<T> dbTableItem) throws SQLException {
+        String query = generateDeleteQuery(dbTableItem);
+        Statement s = connection.createStatement();
+        s.executeUpdate(query);
+    }
 }

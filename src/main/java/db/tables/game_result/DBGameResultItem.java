@@ -26,13 +26,13 @@ public class DBGameResultItem extends DBTableItem<DBGameResult> {
         super(new DBGameResult());
         DBGameResult table = getTable();
 
-        int columnIndex = table.getIdGame().getIndex();
+        int columnIndex = table.getIdGameResult().getIndex();
         idGameResult = new DbColumnValue<>(table.getIdGameResult());
         idGameResult.setValue(rs.getInt(columnIndex));
 
         columnIndex = table.getIdGame().getIndex();
-        idGameResult = new DbColumnValue<>(table.getIdGame());
-        idGameResult.setValue(rs.getInt(columnIndex));
+        idGame = new DbColumnValue<>(table.getIdGame());
+        idGame.setValue(rs.getInt(columnIndex));
 
         columnIndex = table.getIdOpponent().getIndex();
         idOpponent = new DbColumnValue<>(table.getIdOpponent());

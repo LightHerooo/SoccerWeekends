@@ -9,7 +9,7 @@ module main.soccerweekends {
     opens gui.versus;
     opens gui.versus.games;
     opens gui.versus.games.add_game;
-    opens gui.versus.games.add_game.add_opponent_result;
+    opens gui.versus.games.add_game.opponent_game_result;
     opens gui.versus.games.types.duel;
     opens gui.versus.games.types;
 

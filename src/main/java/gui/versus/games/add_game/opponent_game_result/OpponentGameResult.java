@@ -1,4 +1,4 @@
-package gui.versus.games.add_game.add_opponent_result;
+package gui.versus.games.add_game.opponent_game_result;
 
 import db.tables.game_result.DBGameResultItem;
 import javafx.JavaFXUtils;
@@ -8,12 +8,12 @@ import javafx.scene.layout.Pane;
 
 import java.io.IOException;
 
-public class AddOpponentResult extends AnchorPane {
-    private AddOpponentResultController controller;
+public class OpponentGameResult extends AnchorPane {
+    private OpponentGameResultController controller;
 
-    public AddOpponentResult(DBGameResultItem DBGameResultItem) {
+    public OpponentGameResult(DBGameResultItem DBGameResultItem) {
         try {
-            controller = new AddOpponentResultController(DBGameResultItem);
+            controller = new OpponentGameResultController(DBGameResultItem);
             FXMLLoader loader = controller.getLoader();
             loader.load(); // Прогружаем FXML (после этого поля класса не будут NULL)
             controller = loader.getController(); // Получаем прогруженный контроллер
@@ -28,7 +28,7 @@ public class AddOpponentResult extends AnchorPane {
         this.controller = controller;
     }
 
-    public AddOpponentResultController getController() {
+    public OpponentGameResultController getController() {
         return controller;
     }
 }

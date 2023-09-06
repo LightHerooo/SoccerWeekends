@@ -3,6 +3,7 @@ package gui.versus.games;
 import db.DBConnect;
 import db.DBFunctions;
 import db.DBProcedures;
+import db.tables.game.DBGame;
 import db.tables.game.DBGameItem;
 import db.tables.opponent.DBOpponentItem;
 import gui.versus.games.types.Game;
@@ -14,7 +15,9 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -47,6 +50,36 @@ public class GamesController implements Initializable, FXMLController {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        selectGames();
+
+        lvGameResults.setOnMouseClicked(this::lvGameResults_mouseClicked);
+        btnAdd.setOnAction(this::btnAdd_click);
+        btnEdit.setOnAction(this::btnEdit_click);
+        btnDelete.setOnAction(this::btnDelete_click);
+    }
+
+    /*
+        Контроллер содержит поля элементов, находящихся в FXML-е
+        Наличие полей, которые не содержатся в FXML-е, вызовет ошибку
+        Чтобы обойти это, необходимо установить полученный контроллер load-еру.
+
+        FXML не должен иметь свойства fx:controller
+     */
+    @Override
+    public FXMLLoader getLoader() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Games.fxml"));
+        fxmlLoader.setController(this);
+        return fxmlLoader;
+    }
+
+    @Override
+    public Pane getMainPane() {
+        return mainPane;
+    }
+    
+    private void selectGames() {
+        lvGameResults.getItems().clear();
+
         try (Connection connection = DBConnect.getConnection();){
             // Выполняем поиск игр, где участвуют два выбранных игрока
             String query = DBProcedures.GetGamesPlayedByTwoOpponents.getQuery();
@@ -72,43 +105,56 @@ public class GamesController implements Initializable, FXMLController {
 
 
                 } else if (countOfPlayers == 2) { // Если всего 2 игрока - это дуэль
-                    Duel d = new Duel(item);
-                    lvGameResults.getItems().add(d);
+                    /*Duel d = new Duel(item);
+                    lvGameResults.getItems().add(d);*/
                 }
+
+                Duel d = new Duel(item);
+                lvGameResults.getItems().add(d);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
-        lvGameResults.setOnMouseClicked(this::lvGameResults_mouseClicked);
-        btnAdd.setOnAction(this::btnAdd_click);
-        btnEdit.setOnAction(this::btnEdit_click);
-    }
-
-    @Override
-    public FXMLLoader getLoader() throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Games.fxml"));
-        // Если контроллер содержит конструктор с параметрами - вызов данного метода необходим
-        fxmlLoader.setController(this);
-        return fxmlLoader;
-    }
-
-    @Override
-    public Pane getMainPane() {
-        return mainPane;
     }
 
     private void btnAdd_click(ActionEvent actionEvent) {
         AddGameController addGameController = new AddGameController(new DBGameItem());
-        addGameController.getStage().show();
+        addGameController.getStage().showAndWait();
+
+        selectGames();
     }
 
     private void btnEdit_click(ActionEvent actionEvent) {
         Game gr = lvGameResults.getSelectionModel().getSelectedItem();
         if (gr != null) {
             AddGameController addGameController = new AddGameController(gr.getGameItem());
-            addGameController.getStage().show();
+            addGameController.getStage().showAndWait();
         }
+
+        selectGames();
+    }
+
+    private void btnDelete_click(ActionEvent actionEvent) {
+        Game gr = lvGameResults.getSelectionModel().getSelectedItem();
+        if (gr != null) {
+            DBGameItem item = gr.getGameItem();
+            if (item != null) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Удаление игры");
+                alert.setHeaderText("Вы уверены, что хотите удалить выбранную игру?");
+                alert.showAndWait();
+                if (alert.getResult() == ButtonType.OK) {
+                    try (Connection connection = DBConnect.getConnection();) {
+                        DBGame table = new DBGame();
+                        table.delete(connection, item);
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }
+
+        selectGames();
     }
 
     private void lvGameResults_mouseClicked(MouseEvent mouseEvent) {
