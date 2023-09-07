@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane fx:id="mainPane" minHeight="120" minWidth="100" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <VBox alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <VBox alignment="CENTER" maxHeight="72.0" maxWidth="72.0" prefHeight="200.0" prefWidth="100.0">
+                    <children>
+                  <Label fx:id="lbPlace" text="Место">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Label>
+                        <ImageView fx:id="ivAvatar" fitHeight="48.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true" />
+                      <Label fx:id="lbScore" text="Очки">
+                         <font>
+                            <Font name="System Bold" size="12.0" />
+                         </font></Label>
+                    </children>
+                </VBox>
+                <Label fx:id="lbName" text="Имя">
+                    <VBox.margin>
+                        <Insets top="5.0" />
+                    </VBox.margin>
+                    <font>
+                        <Font size="14.0" />
+                    </font>
+                </Label>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

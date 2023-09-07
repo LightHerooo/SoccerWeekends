@@ -1,6 +1,7 @@
 package gui.versus.games.add_game;
 
 import db.DBConnect;
+import db.DBProcedures;
 import db.QueryUtils;
 import db.table.DBTable;
 import db.tables.game.DBGame;
@@ -103,9 +104,17 @@ public class AddGameController implements Initializable, FXMLController, Stageab
 
             // Добавляем игроков с их результатом
             try (Connection connection = DBConnect.getConnection()) {
-                DBGameResult table = new DBGameResult();
+               /* DBGameResult table = new DBGameResult();
                 ResultSet rs = table.selectWithOneParameter(connection, table.getIdGame(),
-                        dbGameItem.getIdGame().getValue());
+                        dbGameItem.getIdGame().getValue());*/
+
+                // Получаем рейтинг (результаты, отсортированные по очкам)
+                String query = DBProcedures.GetGameRating.getQuery();
+                CallableStatement cs = connection.prepareCall(query);
+                cs.setInt(1, dbGameItem.getIdGame().getValue());
+                cs.execute();
+
+                ResultSet rs = cs.getResultSet();
                 while (rs.next()) {
                     DBGameResultItem item = new DBGameResultItem(rs);
                     OpponentGameResult aor = new OpponentGameResult(item);
@@ -183,10 +192,17 @@ public class AddGameController implements Initializable, FXMLController, Stageab
         for (OpponentGameResult ogr: lvOpponentGameResults.getItems()) {
             opponentNames.add(ogr.getController().getSelectedOpponentItem().getName().getValue());
         }
+
         if (opponentNames.size() != lvOpponentGameResults.getItems().size()) {
             errorItemIndex++;
             errorItems.append(String.format(errorItemPattern, errorItemIndex,
                     "Участники не должны повторяться"));
+        }
+
+        if (opponentNames.size() < 2) {
+            errorItemIndex++;
+            errorItems.append(String.format(errorItemPattern, errorItemIndex,
+                    "Минимальное количество участников: 2"));
         }
 
         if (errorItemIndex > 0) {

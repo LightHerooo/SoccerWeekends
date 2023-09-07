@@ -95,9 +95,7 @@ public class DBGameResult extends DBTable {
             updateSetItems.put(dbColumn.getIndex(), updateSetItem);
 
             String updateSetItemsStr = String.join(", ", updateSetItems.values());
-            query = "UPDATE %s SET %s WHERE %s IN (%s)";
-            query = String.format(query, getTableName(), updateSetItemsStr,
-                    idGameResult.getColumnName(), item.getIdGameResult().getOldValue());
+            query = QueryUtils.collectUpdateQuery(getTableName(), updateSetItemsStr, item.getIdGameResult());
         }
 
         return query;
@@ -108,9 +106,7 @@ public class DBGameResult extends DBTable {
         String query = null;
 
         if (dbTableItem instanceof DBGameResultItem item) {
-            query = "DELETE FROM %s WHERE %s IN (%s)";
-            query = String.format(query, getTableName(),
-                    idGameResult.getColumnName(), item.getIdGameResult().getValue());
+            query = QueryUtils.collectDeleteQuery(getTableName(), item.getIdGameResult());
         }
 
         return query;

@@ -1,9 +1,9 @@
-package gui.versus.games.types.duel;
+package gui.versus.games.game;
 
 import db.tables.game.DBGameItem;
-import gui.versus.games.types.Game;
 import javafx.JavaFXUtils;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 
 import java.io.IOException;
@@ -13,12 +13,12 @@ import java.io.IOException;
     Класс хранит в себе прогруженный controller, который после прогрузки добавляется в AnchorPane
     Полученный AnchorPane (внутри которого прогруженный контроллер) добавляется как элемент в ListView
  */
-public class Duel extends Game {
-    private DuelController controller;
+public class Game extends AnchorPane {
+    private DBGameItem dbGameItem;
+    private GameController controller;
 
-    public Duel(DBGameItem DBGameItem) {
-        super(DBGameItem);
-
+    public Game(DBGameItem dBGameItem) {
+        this.dbGameItem = dBGameItem;
         try {
             /*
                1. Получаем FXML
@@ -28,7 +28,7 @@ public class Duel extends Game {
                5. Добавляем mainPane в AnchorPane, который будет добавлен как элемент ListView
             */
 
-            controller = new DuelController(DBGameItem);
+            controller = new GameController(dBGameItem);
             FXMLLoader loader = controller.getLoader();
             loader.load();
             controller = loader.getController();
@@ -41,7 +41,11 @@ public class Duel extends Game {
         }
     }
 
-    public DuelController getController() {
+    public DBGameItem getDbGameItem() {
+        return dbGameItem;
+    }
+
+    public GameController getController() {
         return controller;
     }
 }

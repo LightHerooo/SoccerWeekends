@@ -6,12 +6,10 @@ import db.DBProcedures;
 import db.tables.game.DBGame;
 import db.tables.game.DBGameItem;
 import db.tables.opponent.DBOpponentItem;
-import gui.versus.games.types.Game;
 import javafx.FXMLController;
 import gui.versus.games.add_game.AddGameController;
-import gui.versus.games.types.duel.Duel;
+import gui.versus.games.game.Game;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -35,7 +33,7 @@ public class GamesController implements Initializable, FXMLController {
     @FXML
     private AnchorPane mainPane;
     @FXML
-    private ListView<Game> lvGameResults;
+    private ListView<Game> lvGames;
     @FXML
     private Button btnAdd;
     @FXML
@@ -52,7 +50,7 @@ public class GamesController implements Initializable, FXMLController {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         selectGames();
 
-        lvGameResults.setOnMouseClicked(this::lvGameResults_mouseClicked);
+        lvGames.setOnMouseClicked(this::lvGameResults_mouseClicked);
         btnAdd.setOnAction(this::btnAdd_click);
         btnEdit.setOnAction(this::btnEdit_click);
         btnDelete.setOnAction(this::btnDelete_click);
@@ -78,7 +76,7 @@ public class GamesController implements Initializable, FXMLController {
     }
     
     private void selectGames() {
-        lvGameResults.getItems().clear();
+        lvGames.getItems().clear();
 
         try (Connection connection = DBConnect.getConnection();){
             // Выполняем поиск игр, где участвуют два выбранных игрока
@@ -91,26 +89,8 @@ public class GamesController implements Initializable, FXMLController {
             ResultSet rs = cs.getResultSet();
             while(rs.next()) {
                 DBGameItem item = new DBGameItem(rs);
-
-                // Считаем, сколько игроков в игре
-                query = DBFunctions.GetNumberOfPlayersPlayingTheGame.getName();
-                cs = connection.prepareCall(query);
-                cs.registerOutParameter(1, Types.INTEGER);
-                cs.setInt(2, item.getIdGame().getValue());
-                cs.execute();
-                int countOfPlayers = cs.getInt(1);
-
-                // Если игроков больше 2-х - это групповая игра
-                if (countOfPlayers > 2) {
-
-
-                } else if (countOfPlayers == 2) { // Если всего 2 игрока - это дуэль
-                    /*Duel d = new Duel(item);
-                    lvGameResults.getItems().add(d);*/
-                }
-
-                Duel d = new Duel(item);
-                lvGameResults.getItems().add(d);
+                Game g = new Game(item);
+                lvGames.getItems().add(g);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -125,9 +105,9 @@ public class GamesController implements Initializable, FXMLController {
     }
 
     private void btnEdit_click(ActionEvent actionEvent) {
-        Game gr = lvGameResults.getSelectionModel().getSelectedItem();
-        if (gr != null) {
-            AddGameController addGameController = new AddGameController(gr.getGameItem());
+        Game g = lvGames.getSelectionModel().getSelectedItem();
+        if (g != null) {
+            AddGameController addGameController = new AddGameController(g.getDbGameItem());
             addGameController.getStage().showAndWait();
         }
 
@@ -135,9 +115,9 @@ public class GamesController implements Initializable, FXMLController {
     }
 
     private void btnDelete_click(ActionEvent actionEvent) {
-        Game gr = lvGameResults.getSelectionModel().getSelectedItem();
-        if (gr != null) {
-            DBGameItem item = gr.getGameItem();
+        Game g = lvGames.getSelectionModel().getSelectedItem();
+        if (g != null) {
+            DBGameItem item = g.getDbGameItem();
             if (item != null) {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle("Удаление игры");

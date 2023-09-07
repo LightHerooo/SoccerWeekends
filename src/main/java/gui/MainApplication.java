@@ -11,6 +11,7 @@ import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import utils.OpponentImagesFolder;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -19,8 +20,8 @@ import java.sql.SQLException;
 public final class MainApplication extends Application {
     @Override
     public void start(Stage stage) throws Exception {
-        stage.setWidth(900);
-        stage.setHeight(600);
+        stage.setWidth(1200);
+        stage.setHeight(800);
         stage.setTitle("SoccerWeekends (development)");
 
         MainController msc = new MainController();

@@ -90,9 +90,7 @@ public class DBOpponent extends DBTable {
             /* Собираем полученную мапу и разделяем запятыми
                 Получится общее выражение SET с */
             String updateSetItemsStr = String.join(", ", updateSetItems.values());
-            query = "UPDATE %s SET %s WHERE %s IN (%s)";
-            query = String.format(query, getTableName(), updateSetItemsStr,
-                    idOpponent.getColumnName(), item.getIdOpponent().getOldValue());
+            query = QueryUtils.collectUpdateQuery(getTableName(), updateSetItemsStr, item.getIdOpponent());
         }
 
         return query;
@@ -103,9 +101,7 @@ public class DBOpponent extends DBTable {
 
         if (dbTableItem instanceof DBOpponentItem item) {
             // Удаляем строку с указанным id переданного dbTableItem
-            query = "DELETE FROM %s WHERE %s IN (%s)";
-            query = String.format(query, getTableName(),
-                    idOpponent.getColumnName(), item.getIdOpponent().getValue());
+            query = QueryUtils.collectDeleteQuery(getTableName(), item.getIdOpponent());
         }
 
         return query;

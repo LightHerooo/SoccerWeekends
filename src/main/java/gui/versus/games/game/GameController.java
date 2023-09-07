@@ -1,9 +1,12 @@
-package gui.versus.games.types.duel;
+package gui.versus.games.game;
 
 import db.DBConnect;
+import db.DBFunctions;
 import db.tables.game.DBGameItem;
 import db.tables.game_type.DBGameType;
 import db.tables.game_type.DBGameTypeItem;
+import gui.versus.games.game.types.big_game.BigGameController;
+import gui.versus.games.game.types.duel.DuelController;
 import javafx.FXMLController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -20,7 +23,7 @@ import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.ResourceBundle;
 
-public class DuelController implements FXMLController, Initializable {
+public class GameController implements FXMLController, Initializable {
     private DBGameItem dbGameItem;
 
     @FXML
@@ -32,7 +35,7 @@ public class DuelController implements FXMLController, Initializable {
     @FXML
     private Label lbGameDate;
 
-    public DuelController(DBGameItem dbGameItem) {
+    public GameController(DBGameItem dbGameItem) {
         this.dbGameItem = dbGameItem;
     }
 
@@ -52,9 +55,26 @@ public class DuelController implements FXMLController, Initializable {
                 lbGameDate.setText(dateStr);
             }
 
-            TwoOpponentsController toc = new TwoOpponentsController(dbGameItem);
-            Parent p = toc.getLoader().load();
-            gpResult.add(p, 1, 0);
+            // Считаем, сколько игроков в игре
+            String query = DBFunctions.GetNumberOfPlayersPlayingTheGame.getName();
+            CallableStatement cs = connection.prepareCall(query);
+            cs.registerOutParameter(1, Types.INTEGER);
+            cs.setInt(2, dbGameItem.getIdGame().getValue());
+            cs.execute();
+            int countOfPlayers = cs.getInt(1);
+
+            Parent p = null;
+            // Если игроков больше 2-х - это большая игра
+            if (countOfPlayers > 2) {
+                BigGameController bgc = new BigGameController(dbGameItem);
+                p = bgc.getLoader().load();
+            } else if (countOfPlayers == 2) { // Если всего 2 игрока - это дуэль
+                DuelController dc = new DuelController(dbGameItem);
+                p = dc.getLoader().load();
+            }
+
+            if (p != null)
+                gpResult.add(p, 1, 0);
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -62,7 +82,7 @@ public class DuelController implements FXMLController, Initializable {
 
     @Override
     public FXMLLoader getLoader() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("Duel.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("Game.fxml"));
         loader.setController(this);
         return loader;
     }

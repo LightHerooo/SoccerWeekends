@@ -1,10 +1,10 @@
-package gui.versus.games.types;
+package gui.versus.games.game.types.duel;
 
 import javafx.scene.paint.Color;
 
 public enum ResultColor {
     WIN (Color.GREEN),
-    DRAW (Color.LIGHTGOLDENRODYELLOW),
+    DRAW (Color.YELLOW),
     LOSE (Color.DARKRED);
 
     private Color color;
