@@ -12,7 +12,7 @@ import java.util.*;
 public class DBOpponent extends DBTable {
     private DBColumn<Integer> idOpponent = new DBColumn<>("id_opponent", 1);
     private DBColumn<String> name = new DBColumn<>("name", 2);
-    private DBColumn<String> nameImage = new DBColumn<>("name_image", 3);
+    private DBColumn<String> imageName = new DBColumn<>("image_name", 3);
 
     public DBOpponent() {
         super("opponent", true);
@@ -24,8 +24,8 @@ public class DBOpponent extends DBTable {
     public DBColumn<String> getName() {
         return name;
     }
-    public DBColumn<String> getNameImage() {
-        return nameImage;
+    public DBColumn<String> getImageName() {
+        return imageName;
     }
 
     @Override
@@ -51,7 +51,7 @@ public class DBOpponent extends DBTable {
             columnValue = item.getName();
             ps.setObject(columnValue.getDbColumn().getIndex() - offset, columnValue.getValue());
 
-            columnValue = item.getNameImage();
+            columnValue = item.getImageName();
             ps.setObject(columnValue.getDbColumn().getIndex() - offset, columnValue.getValue());
         }
 
@@ -77,7 +77,7 @@ public class DBOpponent extends DBTable {
 
             /* Нужно добавить все поля таблицы в мапу, чтобы собрать запрос изменения
                 (Поля id, name и так далее)*/
-            dbColumn = nameImage;
+            dbColumn = imageName;
             /* Генерируем SET выражение, которое в будущем будем объединять с остальными через запятую
                 Генерируется: <название_колонки> = ? (? - параметр для вставки значения, используется в PreparedStatement)*/
             updateSetItem = QueryUtils.getUpdateSetItem(dbColumn.getColumnName());

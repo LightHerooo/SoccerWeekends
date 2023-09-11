@@ -41,9 +41,7 @@ public abstract class DBTable{
             String query = "SELECT * FROM %s";
             query = String.format(query, tableName);
             Statement st = connection.createStatement();
-            st.execute(query);
-
-            rs = st.getResultSet();
+            rs = st.executeQuery(query);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -62,9 +60,7 @@ public abstract class DBTable{
             for (int i = 0; i < value.length; i++) {
                 st.setObject(i + 1, value[i]);
             }
-            st.execute();
-
-            rs = st.getResultSet();
+            rs = st.executeQuery();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

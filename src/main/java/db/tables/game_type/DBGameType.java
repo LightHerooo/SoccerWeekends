@@ -4,13 +4,16 @@ import db.table.DBColumn;
 import db.table.DBTable;
 import db.table.DBTableItem;
 import db.table.DbColumnValue;
-import db.tables.opponent.DBOpponentItem;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class DBGameType extends DBTable {
     private DBColumn<Integer> idGameType = new DBColumn<>("id_game_type", 1);
     private DBColumn<String> title = new DBColumn<>("title", 2);
+    private DBColumn<String> imageName = new DBColumn<>("image_name", 3);
 
     public DBGameType() { super("game_type", true); }
 
@@ -20,6 +23,9 @@ public class DBGameType extends DBTable {
 
     public DBColumn<String> getTitle() {
         return title;
+    }
+    public DBColumn<String> getImageName() {
+        return imageName;
     }
 
     @Override
@@ -39,6 +45,9 @@ public class DBGameType extends DBTable {
             }
 
             columnValue = item.getTitle();
+            ps.setObject(columnValue.getDbColumn().getIndex() - offset, columnValue.getValue());
+
+            columnValue = item.getImageName();
             ps.setObject(columnValue.getDbColumn().getIndex() - offset, columnValue.getValue());
         }
 

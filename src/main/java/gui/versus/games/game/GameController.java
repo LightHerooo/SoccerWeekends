@@ -8,16 +8,22 @@ import db.tables.game_type.DBGameTypeItem;
 import gui.versus.games.game.types.big_game.BigGameController;
 import gui.versus.games.game.types.duel.DuelController;
 import javafx.FXMLController;
+import javafx.JavaFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -31,9 +37,13 @@ public class GameController implements FXMLController, Initializable {
     @FXML
     private GridPane gpResult;
     @FXML
+    private ImageView ivGameType;
+    @FXML
     private Label lbGameType;
     @FXML
-    private Label lbGameDate;
+    private Label lbGameInfo;
+    @FXML
+    private AnchorPane apGameResult;
 
     public GameController(DBGameItem dbGameItem) {
         this.dbGameItem = dbGameItem;
@@ -52,7 +62,26 @@ public class GameController implements FXMLController, Initializable {
 
                 SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
                 String dateStr = sdf.format(dbGameItem.getGameDate().getValue());
-                lbGameDate.setText(dateStr);
+
+                String gameInfoPattern = "#%s / %s";
+                lbGameInfo.setText(String.format(gameInfoPattern, dbGameItem.getIdGame().getValue(), dateStr));
+
+                String imgPathPattern = "images/game_type/%s";
+                URL urlPath = getClass().getClassLoader().getResource(String.format(imgPathPattern, gti.getImageName().getValue()));
+                if (urlPath == null) {
+                    urlPath = getClass().getClassLoader().getResource(String.format(imgPathPattern, "unknown.png"));
+                }
+
+                try {
+                    File file = new File(urlPath.toURI());
+                    try(FileInputStream fis = new FileInputStream(file)) {
+                        ivGameType.setImage(new Image(fis));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
             // Считаем, сколько игроков в игре
@@ -74,7 +103,10 @@ public class GameController implements FXMLController, Initializable {
             }
 
             if (p != null)
-                gpResult.add(p, 1, 0);
+            {
+                JavaFXUtils.setZeroAnchors(p);
+                apGameResult.getChildren().setAll(p);
+            }
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
         }

@@ -1,7 +1,9 @@
 package db;
 
 public enum DBFunctions {
-    GetNumberOfPlayersPlayingTheGame ("GetNumberOfPlayersPlayingTheGame(?)", 1);
+    GetNumberOfPlayersPlayingTheGame ("GetNumberOfPlayersPlayingTheGame(?)", 1),
+    GetNumberOfOpponentGames ("GetNumberOfOpponentGames(?)", 1),
+    GetNumberOfOpponentWins ("GetNumberOfOpponentWins(?)", 1);
 
     private String name;
 

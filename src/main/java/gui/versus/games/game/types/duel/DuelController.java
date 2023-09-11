@@ -6,6 +6,7 @@ import db.tables.game_result.DBGameResult;
 import db.tables.game_result.DBGameResultItem;
 import db.tables.opponent.DBOpponent;
 import db.tables.opponent.DBOpponentItem;
+import gui.versus.games.game.types.OpponentResult;
 import javafx.FXMLController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -88,14 +89,14 @@ public class DuelController implements Initializable, FXMLController {
 
                 // Фон картинки игроков
                 if (firstScore > secondScore) {
-                    docFirst.setBorderColorInImage(ResultColor.WIN.getColor());
-                    docSecond.setBorderColorInImage(ResultColor.LOSE.getColor());
+                    docFirst.setIvOpponentResultImg(OpponentResult.WINNER);
+                    docSecond.setIvOpponentResultImg(OpponentResult.LOSER);
                 } else if (firstScore < secondScore) {
-                    docFirst.setBorderColorInImage(ResultColor.LOSE.getColor());
-                    docSecond.setBorderColorInImage(ResultColor.WIN.getColor());
+                    docFirst.setIvOpponentResultImg(OpponentResult.LOSER);
+                    docSecond.setIvOpponentResultImg(OpponentResult.WINNER);
                 } else {
-                    docFirst.setBorderColorInImage(ResultColor.DRAW.getColor());
-                    docSecond.setBorderColorInImage(ResultColor.DRAW.getColor());
+                    docFirst.setIvOpponentResultImg(OpponentResult.DRAW);
+                    docSecond.setIvOpponentResultImg(OpponentResult.DRAW);
                 }
             } catch (SQLException | IOException e) {
                 throw new RuntimeException(e);

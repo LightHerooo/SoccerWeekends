@@ -9,7 +9,7 @@ import java.sql.SQLException;
 public class DBOpponentItem extends DBTableItem<DBOpponent> {
     private DbColumnValue<Integer> idOpponent;
     private DbColumnValue<String> name;
-    private DbColumnValue<String> nameImage;
+    private DbColumnValue<String> imageName;
 
     public DBOpponentItem() {
         super(new DBOpponent());
@@ -17,7 +17,7 @@ public class DBOpponentItem extends DBTableItem<DBOpponent> {
 
         idOpponent = new DbColumnValue<>(table.getIdOpponent());
         name = new DbColumnValue<>(table.getName());
-        nameImage = new DbColumnValue<>(table.getNameImage());
+        imageName = new DbColumnValue<>(table.getImageName());
     }
 
     public DBOpponentItem(ResultSet rs) throws SQLException {
@@ -32,9 +32,9 @@ public class DBOpponentItem extends DBTableItem<DBOpponent> {
         name = new DbColumnValue<>(table.getName());
         name.setValue(rs.getString(columnIndex));
 
-        columnIndex = table.getNameImage().getIndex();
-        nameImage = new DbColumnValue<>(table.getNameImage());
-        nameImage.setValue(rs.getString(columnIndex));
+        columnIndex = table.getImageName().getIndex();
+        imageName = new DbColumnValue<>(table.getImageName());
+        imageName.setValue(rs.getString(columnIndex));
     }
 
     public DbColumnValue<Integer> getIdOpponent() {
@@ -43,8 +43,8 @@ public class DBOpponentItem extends DBTableItem<DBOpponent> {
     public DbColumnValue<String> getName() {
         return name;
     }
-    public DbColumnValue<String> getNameImage() {
-        return nameImage;
+    public DbColumnValue<String> getImageName() {
+        return imageName;
     }
 
     @Override
@@ -59,10 +59,5 @@ public class DBOpponentItem extends DBTableItem<DBOpponent> {
 
         DBOpponentItem item = (DBOpponentItem) obj;
         return this.getIdOpponent().getValue().intValue() == item.getIdOpponent().getValue().intValue();
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 }

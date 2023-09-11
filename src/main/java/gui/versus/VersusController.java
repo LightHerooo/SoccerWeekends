@@ -1,55 +1,46 @@
 package gui.versus;
 
-import db.DBConnect;
-import db.tables.opponent.DBOpponent;
 import db.tables.opponent.DBOpponentItem;
-import gui.versus.games.GamesController;
-import javafx.FXMLController;
 import gui.MainController;
+import gui.versus.games.GamesController;
+import gui.versus.select_opponent.SelectOpponent;
+import javafx.FXMLController;
 import javafx.JavaFXUtils;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class VersusController implements Initializable, FXMLController {
     @FXML
     private AnchorPane mainPane;
     @FXML
-    private ComboBox<DBOpponentItem> cbFirstOpp;
+    private VBox vbOpponents;
     @FXML
-    private ComboBox<DBOpponentItem> cbSecondOpp;
+    private AnchorPane apGames;
     @FXML
-    private AnchorPane contentPane;
+    private Button btnBack;
+    @FXML
+    private Button btnAddOpponent;
 
     // Вызывается при Load FXML
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        ObservableList<DBOpponentItem> opponents = FXCollections.observableArrayList();
-        try (Connection connection = DBConnect.getConnection()){
-            DBOpponent table = new DBOpponent();
-            ResultSet rs = table.selectAll(connection);
-            while (rs.next()) {
-                DBOpponentItem item = new DBOpponentItem(rs);
-                opponents.add(item);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        btnAddOpponent_click(null);
 
-        cbFirstOpp.setItems(opponents);
-        cbSecondOpp.setItems(opponents);
+       // vbOpponents.getChildren().addListener((InvalidationListener) observable -> showOpponentsResult());
     }
 
     @Override
@@ -64,15 +55,32 @@ public class VersusController implements Initializable, FXMLController {
     }
 
     @FXML
-    private void showOpponentsResult(ActionEvent actionEvent) throws IOException {
-        DBOpponentItem opponentFirst = cbFirstOpp.getValue();
-        DBOpponentItem opponentSecond = cbSecondOpp.getValue();
-        if (opponentFirst == null || opponentSecond == null) return;
+    private void showOpponentsResult() {
+        List<DBOpponentItem> ois = new ArrayList<>();
+        for (Node n: vbOpponents.getChildren()) {
+            if (n instanceof SelectOpponent so) {
+                ois.add(so.getController().getSelectedOpponentItem());
+            }
+        }
 
-        GamesController rc = new GamesController(opponentFirst, opponentSecond);
-        Parent p = rc.getLoader().load();
-        JavaFXUtils.setZeroAnchors(p);
-        contentPane.getChildren().setAll(p);
+        try {
+            GamesController rc = new GamesController(ois);
+            Parent p = rc.getLoader().load();
+            JavaFXUtils.setZeroAnchors(p);
+            apGames.getChildren().setAll(p);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void changeSelectOpponentNumeration() {
+        int index = 1;
+        for (Node p: vbOpponents.getChildren()) {
+            if (p instanceof SelectOpponent so) {
+                so.getController().setOpponentNumber(index);
+                index++;
+            }
+        }
     }
 
     @FXML
@@ -83,5 +91,22 @@ public class VersusController implements Initializable, FXMLController {
 
         Pane mp = (Pane) mainPane.getParent();
         mp.getChildren().setAll(p);
+    }
+
+    @FXML
+    public void btnAddOpponent_click(ActionEvent actionEvent) {
+        SelectOpponent so = new SelectOpponent();
+        so.getController().getCbOpponent().getSelectionModel().selectedItemProperty().addListener(changeListener -> {
+            showOpponentsResult();
+        });
+
+        so.getController().getBtnDelete().setOnAction(event -> {
+            vbOpponents.getChildren().remove(so);
+            showOpponentsResult();
+            changeSelectOpponentNumeration();
+        });
+
+        vbOpponents.getChildren().add(so);
+        changeSelectOpponentNumeration();
     }
 }

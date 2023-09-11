@@ -1,9 +1,6 @@
 package gui;
 
 import db.DBConnect;
-import db.table.DBColumn;
-import db.table.DBTable;
-import db.tables.game_result.DBGameResultItem;
 import db.tables.opponent.DBOpponent;
 import db.tables.opponent.DBOpponentItem;
 import javafx.JavaFXUtils;
@@ -11,10 +8,8 @@ import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import utils.OpponentImagesFolder;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public final class MainApplication extends Application {

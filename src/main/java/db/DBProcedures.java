@@ -1,7 +1,7 @@
 package db;
 
 public enum DBProcedures {
-    GetGamesPlayedByTwoOpponents ("GetGamesPlayedByTwoOpponents(?, ?)"),
+    GetGamesBetweenOpponents ("GetGamesBetweenOpponents(?)"),
     GetGameRating ("GetGameRating(?)");
 
     private String query;

@@ -1,14 +1,14 @@
 package gui.versus.games;
 
+import com.microsoft.sqlserver.jdbc.SQLServerDataTable;
 import db.DBConnect;
-import db.DBFunctions;
 import db.DBProcedures;
 import db.tables.game.DBGame;
 import db.tables.game.DBGameItem;
 import db.tables.opponent.DBOpponentItem;
-import javafx.FXMLController;
 import gui.versus.games.add_game.AddGameController;
 import gui.versus.games.game.Game;
+import javafx.FXMLController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,11 +24,11 @@ import javafx.scene.layout.Pane;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class GamesController implements Initializable, FXMLController {
-    private DBOpponentItem opponentFirst;
-    private DBOpponentItem opponentSecond;
+    private List<DBOpponentItem> dbOpponentItems;
 
     @FXML
     private AnchorPane mainPane;
@@ -41,9 +41,8 @@ public class GamesController implements Initializable, FXMLController {
     @FXML
     private Button btnDelete;
 
-    public GamesController(DBOpponentItem opponentFirst, DBOpponentItem opponentSecond) {
-        this.opponentFirst = opponentFirst;
-        this.opponentSecond = opponentSecond;
+    public GamesController(List<DBOpponentItem> dbOpponentItems) {
+        this.dbOpponentItems = dbOpponentItems;
     }
 
     @Override
@@ -79,14 +78,20 @@ public class GamesController implements Initializable, FXMLController {
         lvGames.getItems().clear();
 
         try (Connection connection = DBConnect.getConnection();){
-            // Выполняем поиск игр, где участвуют два выбранных игрока
-            String query = DBProcedures.GetGamesPlayedByTwoOpponents.getQuery();
-            CallableStatement cs = connection.prepareCall(query);
-            cs.setInt(1, opponentFirst.getIdOpponent().getValue());
-            cs.setInt(2, opponentSecond.getIdOpponent().getValue());
-            cs.execute();
+            SQLServerDataTable id_table = new SQLServerDataTable();
+            id_table.setTvpName("ID_TABLE");
+            id_table.addColumnMetadata("id", Types.INTEGER);
+            for (DBOpponentItem oi: dbOpponentItems) {
+                if (oi != null) {
+                    id_table.addRow(oi.getIdOpponent().getValue());
+                }
+            }
 
-            ResultSet rs = cs.getResultSet();
+            String query = DBProcedures.GetGamesBetweenOpponents.getQuery();
+            CallableStatement cs = connection.prepareCall(query);
+            cs.setObject(1, id_table);
+
+            ResultSet rs = cs.executeQuery();
             while(rs.next()) {
                 DBGameItem item = new DBGameItem(rs);
                 Game g = new Game(item);
@@ -109,9 +114,9 @@ public class GamesController implements Initializable, FXMLController {
         if (g != null) {
             AddGameController addGameController = new AddGameController(g.getDbGameItem());
             addGameController.getStage().showAndWait();
-        }
 
-        selectGames();
+            selectGames();
+        }
     }
 
     private void btnDelete_click(ActionEvent actionEvent) {
@@ -132,9 +137,9 @@ public class GamesController implements Initializable, FXMLController {
                     }
                 }
             }
-        }
 
-        selectGames();
+            selectGames();
+        }
     }
 
     private void lvGameResults_mouseClicked(MouseEvent mouseEvent) {

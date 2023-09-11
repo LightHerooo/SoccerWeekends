@@ -9,6 +9,7 @@ import java.sql.SQLException;
 public class DBGameTypeItem extends DBTableItem<DBGameType> {
     private DbColumnValue<Integer> idGameType;
     private DbColumnValue<String> title;
+    private DbColumnValue<String> imageName;
 
     public DBGameTypeItem() {
         super(new DBGameType());
@@ -16,6 +17,7 @@ public class DBGameTypeItem extends DBTableItem<DBGameType> {
 
         idGameType = new DbColumnValue<>(table.getIdGameType());
         title = new DbColumnValue<>(table.getTitle());
+        imageName = new DbColumnValue<>(table.getImageName());
     }
 
     public DBGameTypeItem(ResultSet rs) throws SQLException {
@@ -29,6 +31,10 @@ public class DBGameTypeItem extends DBTableItem<DBGameType> {
         columnIndex = table.getTitle().getIndex();
         title = new DbColumnValue<>(table.getTitle());
         title.setValue(rs.getString(columnIndex));
+
+        columnIndex = table.getImageName().getIndex();
+        imageName = new DbColumnValue<>(table.getImageName());
+        imageName.setValue(rs.getString(columnIndex));
     }
 
     public DbColumnValue<Integer> getIdGameType() {
@@ -37,6 +43,9 @@ public class DBGameTypeItem extends DBTableItem<DBGameType> {
 
     public DbColumnValue<String> getTitle() {
         return title;
+    }
+    public DbColumnValue<String> getImageName() {
+        return imageName;
     }
 
     @Override

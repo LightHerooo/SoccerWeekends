@@ -6,16 +6,15 @@ import db.tables.game.DBGameItem;
 import db.tables.game_result.DBGameResultItem;
 import db.tables.opponent.DBOpponent;
 import db.tables.opponent.DBOpponentItem;
+import gui.versus.games.game.types.OpponentResult;
 import javafx.FXMLController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 
 import java.io.IOException;
 import java.net.URL;
@@ -71,7 +70,7 @@ public class BigGameController implements Initializable, FXMLController {
                         gris.get(i).getIdOpponent().getValue());
                 if (rs.next()) {
                     DBOpponentItem item = new DBOpponentItem(rs);
-                    BigGameOpponentController bgoc = new BigGameOpponentController(item, i + 1,
+                    BigGameOpponentController bgoc = new BigGameOpponentController(item,
                             gris.get(i).getScore().getValue());
                     bgocs.add(bgoc);
                 }
@@ -81,19 +80,19 @@ public class BigGameController implements Initializable, FXMLController {
                 BigGameOpponentController bgoc = bgocs.get(0);
                 if (bgoc != null) {
                     gpOpponents.add(bgoc.getLoader().load(), 0, 0);
-                    bgoc.setBorderColorInImage(Color.YELLOW);
+                    bgoc.setPlaceImg(OpponentResult.FIRST);
                 }
 
                 bgoc = bgocs.get(1);
                 if (bgoc != null) {
                     gpOpponents.add(bgoc.getLoader().load(), 1, 0);
-                    bgoc.setBorderColorInImage(Color.GRAY);
+                    bgoc.setPlaceImg(OpponentResult.SECOND);
                 }
 
                 bgoc = bgocs.get(2);
                 if (bgoc != null) {
                     gpOpponents.add(bgoc.getLoader().load(), 2, 0);
-                    bgoc.setBorderColorInImage(Color.BROWN);
+                    bgoc.setPlaceImg(OpponentResult.THIRD);
                 }
 
                 int numberOfOtherPlayers = gris.size() - MAX_DISPLAY_OPPONENTS;
