@@ -59,6 +59,6 @@ public class DBGameTypeItem extends DBTableItem<DBGameType> {
         if (obj == null || obj.getClass() != this.getClass()) return false;
 
         DBGameTypeItem item = (DBGameTypeItem) obj;
-        return this.getIdGameType().getValue() == item.getIdGameType().getValue();
+        return this.getIdGameType().getValue().intValue() == item.getIdGameType().getValue().intValue();
     }
 }

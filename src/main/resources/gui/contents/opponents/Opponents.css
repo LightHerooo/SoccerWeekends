@@ -1,0 +1,5 @@
+#my_button {
+    -fx-max-width: Infinity;
+    -fx-max-height: Infinity;
+    -fx-font-size: 10px;
+}

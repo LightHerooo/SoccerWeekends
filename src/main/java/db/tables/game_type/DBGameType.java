@@ -1,5 +1,6 @@
 package db.tables.game_type;
 
+import db.QueryUtils;
 import db.table.DBColumn;
 import db.table.DBTable;
 import db.table.DBTableItem;
@@ -9,6 +10,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class DBGameType extends DBTable {
     private DBColumn<Integer> idGameType = new DBColumn<>("id_game_type", 1);
@@ -56,7 +59,32 @@ public class DBGameType extends DBTable {
 
     @Override
     protected <T extends DBTable> String generateUpdateQuery(DBTableItem<T> dbTableItem) {
-        return null;
+        String query = null;
+
+        if (dbTableItem instanceof DBGameTypeItem item) {
+            Map<Integer, String> updateSetItems = new TreeMap<>();
+
+            DBColumn<?> dbColumn;
+            String updateSetItem;
+            if (!isThereAutoIncrement()) {
+                dbColumn = idGameType;
+                updateSetItem = QueryUtils.getUpdateSetItem(dbColumn.getColumnName());
+                updateSetItems.put(dbColumn.getIndex(), updateSetItem);
+            }
+
+            dbColumn = title;
+            updateSetItem = QueryUtils.getUpdateSetItem(dbColumn.getColumnName());
+            updateSetItems.put(dbColumn.getIndex(), updateSetItem);
+
+            dbColumn = imageName;
+            updateSetItem = QueryUtils.getUpdateSetItem(dbColumn.getColumnName());
+            updateSetItems.put(dbColumn.getIndex(), updateSetItem);
+
+            String updateSetItemsStr = String.join(", ", updateSetItems.values());
+            query = QueryUtils.collectUpdateQuery(getTableName(), updateSetItemsStr, item.getIdGameType());
+        }
+
+        return query;
     }
 
     @Override
