@@ -80,7 +80,7 @@ public class GameController implements FXMLController, Initializable {
             }
 
             // Считаем, сколько игроков в игре
-            String query = DBFunctions.GetNumberOfPlayersPlayingTheGame.getName();
+            String query = DBFunctions.GetNumberOfPlayersPlayingTheGame.getQuery();
             CallableStatement cs = connection.prepareCall(query);
             cs.registerOutParameter(1, Types.INTEGER);
             cs.setInt(2, dbGameItem.getIdGame().getValue());

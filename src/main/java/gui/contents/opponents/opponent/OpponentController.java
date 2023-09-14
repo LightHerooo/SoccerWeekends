@@ -1,7 +1,7 @@
 package gui.contents.opponents.opponent;
 
 import db.DBConnect;
-import db.DBFunctions;
+import db.DBProcedures;
 import db.tables.opponent.DBOpponentItem;
 import folders.OpponentImagesFolder;
 import javafx.FXMLController;
@@ -20,8 +20,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ResourceBundle;
 
 public class OpponentController implements Initializable, FXMLController {
@@ -39,6 +39,8 @@ public class OpponentController implements Initializable, FXMLController {
     private Label lbNumberOfGames;
     @FXML
     private Label lbNumberOfWins;
+    @FXML
+    private Label lbNumberOfDraws;
     @FXML
     private Label lbNumberOfLoses;
 
@@ -63,23 +65,20 @@ public class OpponentController implements Initializable, FXMLController {
         int opponentId = dbOpponentItem.getIdOpponent().getValue();
         int numberOfGames = 0;
         int numberOfWins = 0;
+        int numberOfDraws = 0;
         int numberOfLoses = 0;
         try (Connection connection = DBConnect.getConnection();){
-            String query = DBFunctions.GetNumberOfOpponentGames.getName();
+            String query = DBProcedures.GetOpponentStats.getQuery();
             CallableStatement cs = connection.prepareCall(query);
-            cs.registerOutParameter(1, Types.INTEGER);
-            cs.setInt(2, opponentId);
-            cs.execute();
-            numberOfGames = cs.getInt(1);
+            cs.setObject(1, dbOpponentItem.getIdOpponent().getValue());
 
-            query = DBFunctions.GetNumberOfOpponentWins.getName();
-            cs = connection.prepareCall(query);
-            cs.registerOutParameter(1, Types.INTEGER);
-            cs.setInt(2, opponentId);
-            cs.execute();
-            numberOfWins = cs.getInt(1);
-
-            numberOfLoses = numberOfGames - numberOfWins;
+            ResultSet rs = cs.executeQuery();
+            if (rs.next()) {
+                numberOfGames = rs.getInt(1);
+                numberOfWins = rs.getInt(2);
+                numberOfDraws = rs.getInt(3);
+                numberOfLoses = rs.getInt(4);
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -87,15 +86,18 @@ public class OpponentController implements Initializable, FXMLController {
         lbName.setText(dbOpponentItem.getName().getValue());
         lbID.setText(String.format("#%d", opponentId));
 
-        String opponentStatisticsPattern = "%s %d";
-        Label lbStatistic = lbNumberOfGames;
-        lbStatistic.setText(String.format(opponentStatisticsPattern, lbStatistic.getText(), numberOfGames));
+        String statisticPattern = "%s %s";
+        Label lb = lbNumberOfGames;
+        lb.setText(String.format(statisticPattern, lb.getText(), numberOfGames));
 
-        lbStatistic = lbNumberOfWins;
-        lbStatistic.setText(String.format(opponentStatisticsPattern, lbStatistic.getText(), numberOfWins));
+        lb = lbNumberOfWins;
+        lb.setText(String.format(statisticPattern, lb.getText(), numberOfWins));
 
-        lbStatistic = lbNumberOfLoses;
-        lbStatistic.setText(String.format(opponentStatisticsPattern, lbStatistic.getText(), numberOfLoses));
+        lb = lbNumberOfDraws;
+        lb.setText(String.format(statisticPattern, lb.getText(), numberOfDraws));
+
+        lb = lbNumberOfLoses;
+        lb.setText(String.format(statisticPattern, lb.getText(), numberOfLoses));
     }
 
     @Override

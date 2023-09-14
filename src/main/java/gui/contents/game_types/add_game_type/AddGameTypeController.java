@@ -12,6 +12,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -45,6 +46,8 @@ public class AddGameTypeController implements Initializable, FXMLController, Sta
     @FXML
     private TextField tfTitle;
     @FXML
+    private TextArea taInfo;
+    @FXML
     private Button btnCancel;
     @FXML
     private Button btnSave;
@@ -69,6 +72,7 @@ public class AddGameTypeController implements Initializable, FXMLController, Sta
 
         if (dbGameTypeItem.getIdGameType().getValue() != null) {
             tfTitle.setText(dbGameTypeItem.getTitle().getValue());
+            taInfo.setText(dbGameTypeItem.getInfo().getValue());
         }
 
         btnChangePicture.setOnAction(this::btnChangePicture_click);
@@ -157,6 +161,7 @@ public class AddGameTypeController implements Initializable, FXMLController, Sta
                 dbGameTypeItem.getImageName().setValue(newFileName);
             }
             dbGameTypeItem.getTitle().setValue(tfTitle.getText());
+            dbGameTypeItem.getInfo().setValue(taInfo.getText());
 
             if (dbGameTypeItem.getIdGameType().getValue() == null) {
                 try (Connection connection = DBConnect.getConnection();) {

@@ -17,6 +17,7 @@ public class DBGameType extends DBTable {
     private DBColumn<Integer> idGameType = new DBColumn<>("id_game_type", 1);
     private DBColumn<String> title = new DBColumn<>("title", 2);
     private DBColumn<String> imageName = new DBColumn<>("image_name", 3);
+    private DBColumn<String> info = new DBColumn<>("info", 4);
 
     public DBGameType() { super("game_type", true); }
 
@@ -29,6 +30,9 @@ public class DBGameType extends DBTable {
     }
     public DBColumn<String> getImageName() {
         return imageName;
+    }
+    public DBColumn<String> getInfo() {
+        return info;
     }
 
     @Override
@@ -51,6 +55,9 @@ public class DBGameType extends DBTable {
             ps.setObject(columnValue.getDbColumn().getIndex() - offset, columnValue.getValue());
 
             columnValue = item.getImageName();
+            ps.setObject(columnValue.getDbColumn().getIndex() - offset, columnValue.getValue());
+
+            columnValue = item.getInfo();
             ps.setObject(columnValue.getDbColumn().getIndex() - offset, columnValue.getValue());
         }
 
@@ -77,6 +84,10 @@ public class DBGameType extends DBTable {
             updateSetItems.put(dbColumn.getIndex(), updateSetItem);
 
             dbColumn = imageName;
+            updateSetItem = QueryUtils.getUpdateSetItem(dbColumn.getColumnName());
+            updateSetItems.put(dbColumn.getIndex(), updateSetItem);
+
+            dbColumn = info;
             updateSetItem = QueryUtils.getUpdateSetItem(dbColumn.getColumnName());
             updateSetItems.put(dbColumn.getIndex(), updateSetItem);
 

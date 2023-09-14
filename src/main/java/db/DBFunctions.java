@@ -1,26 +1,25 @@
 package db;
 
 public enum DBFunctions {
-    GetNumberOfPlayersPlayingTheGame ("GetNumberOfPlayersPlayingTheGame(?)", 1),
-    GetNumberOfOpponentGames ("GetNumberOfOpponentGames(?)", 1),
-    GetNumberOfOpponentWins ("GetNumberOfOpponentWins(?)", 1);
+    GetNumberOfPlayersPlayingTheGame ("GetNumberOfPlayersPlayingTheGame", 1, 1);
+    private String query;
 
-    private String name;
-
-    DBFunctions(String name, int numberOfOutParameters) {
-        StringBuilder outParametersStr = new StringBuilder();
-        for (int i = 0; i < numberOfOutParameters; i++) {
-            outParametersStr.append("?");
-            if (i < numberOfOutParameters - 1) {
-                outParametersStr.append(", ");
-            }
+    DBFunctions(String name, int numberOfInParameters, int numberOfOutParameters) {
+        String str;
+        if (numberOfInParameters > 0) {
+            str = String.format("call %s(%s)", name, QueryUtils.getParametersStr(numberOfInParameters));
+        } else {
+            str = String.format("call %s", name);
         }
 
-        String functionStr = "{ %s = call %s }";
-        this.name = String.format(functionStr, outParametersStr, name);
+        if (numberOfOutParameters > 0) {
+            this.query = String.format("{ %s = %s }", QueryUtils.getParametersStr(numberOfOutParameters), str);
+        } else {
+            this.query = String.format("{ %s }", str);
+        }
     }
 
-    public String getName() {
-        return name;
+    public String getQuery() {
+        return query;
     }
 }

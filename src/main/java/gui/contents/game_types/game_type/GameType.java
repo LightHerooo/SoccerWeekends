@@ -22,6 +22,7 @@ public class GameType extends AnchorPane {
             controller = loader.getController();
 
             Pane p = controller.getMainPane();
+            double a = controller.getMainPane().getHeight();
             JavaFXUtils.setZeroAnchors(p);
             getChildren().add(p);
         } catch (IOException e) {

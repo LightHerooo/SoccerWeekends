@@ -37,18 +37,21 @@
                         </VBox>
                         <GridPane GridPane.columnIndex="1">
                             <columnConstraints>
-                                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="70" minWidth="10.0" prefWidth="100.0" />
+                                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="80" minWidth="10.0" prefWidth="100.0" />
                                 <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="5" minWidth="10.0" prefWidth="100.0" />
                                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                             </columnConstraints>
                             <rowConstraints>
                                 <RowConstraints maxHeight="30" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
-                                <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
-                                <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="SOMETIMES" />
                             </rowConstraints>
                             <children>
                                 <Label text="Название:" />
                                 <TextField fx:id="tfTitle" GridPane.columnIndex="2" />
+
+                                <Label text="Информация:" GridPane.rowIndex="1" />
+                                <TextArea fx:id="taInfo" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="1"
+                                    wrapText="true"/>
                             </children>
                         </GridPane>
                     </children>

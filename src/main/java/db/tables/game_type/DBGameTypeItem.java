@@ -10,6 +10,7 @@ public class DBGameTypeItem extends DBTableItem<DBGameType> {
     private DbColumnValue<Integer> idGameType;
     private DbColumnValue<String> title;
     private DbColumnValue<String> imageName;
+    private DbColumnValue<String> info;
 
     public DBGameTypeItem() {
         super(new DBGameType());
@@ -18,6 +19,7 @@ public class DBGameTypeItem extends DBTableItem<DBGameType> {
         idGameType = new DbColumnValue<>(table.getIdGameType());
         title = new DbColumnValue<>(table.getTitle());
         imageName = new DbColumnValue<>(table.getImageName());
+        info = new DbColumnValue<>(table.getInfo());
     }
 
     public DBGameTypeItem(ResultSet rs) throws SQLException {
@@ -35,6 +37,10 @@ public class DBGameTypeItem extends DBTableItem<DBGameType> {
         columnIndex = table.getImageName().getIndex();
         imageName = new DbColumnValue<>(table.getImageName());
         imageName.setValue(rs.getString(columnIndex));
+
+        columnIndex = table.getInfo().getIndex();
+        info = new DbColumnValue<>(table.getInfo());
+        info.setValue(rs.getString(columnIndex));
     }
 
     public DbColumnValue<Integer> getIdGameType() {
@@ -46,6 +52,9 @@ public class DBGameTypeItem extends DBTableItem<DBGameType> {
     }
     public DbColumnValue<String> getImageName() {
         return imageName;
+    }
+    public DbColumnValue<String> getInfo() {
+        return info;
     }
 
     @Override
