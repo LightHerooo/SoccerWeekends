@@ -4,8 +4,8 @@ import db.DBConnect;
 import db.tables.game_type.DBGameType;
 import db.tables.game_type.DBGameTypeItem;
 import folders.GameTypeImagesFolder;
-import javafx.FXMLController;
-import javafx.Stageable;
+import javafx_utils.FXMLController;
+import javafx_utils.Stageable;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -27,6 +27,7 @@ import utils.StringGenerator;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -60,14 +61,18 @@ public class AddGameTypeController implements Initializable, FXMLController, Sta
     public void initialize(URL url, ResourceBundle resourceBundle) {
         GameTypeImagesFolder gtif = new GameTypeImagesFolder();
         File file = gtif.findFile(dbGameTypeItem.getImageName().getValue());
-        if (!file.exists()) {
-            file = gtif.getDefaultFile();
-        }
-
-        try (FileInputStream fis = new FileInputStream(file);){
-            ivPicture.setImage(new Image(fis));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (file.exists()) {
+            try (FileInputStream fis = new FileInputStream(file);){
+                ivPicture.setImage(new Image(fis));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            try (InputStream is = gtif.getDefaultResource()) {
+                ivPicture.setImage(new Image(is));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         if (dbGameTypeItem.getIdGameType().getValue() != null) {

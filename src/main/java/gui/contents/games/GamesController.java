@@ -9,7 +9,7 @@ import db.tables.opponent.DBOpponentItem;
 import gui.contents.games.add_game.AddGameController;
 import gui.contents.games.game.Game;
 import gui.contents.games.select_opponent.SelectOpponent;
-import javafx.FXMLController;
+import javafx_utils.FXMLController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

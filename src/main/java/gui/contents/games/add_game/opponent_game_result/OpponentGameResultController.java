@@ -4,7 +4,7 @@ import db.DBConnect;
 import db.tables.game_result.DBGameResultItem;
 import db.tables.opponent.DBOpponent;
 import db.tables.opponent.DBOpponentItem;
-import javafx.FXMLController;
+import javafx_utils.FXMLController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;

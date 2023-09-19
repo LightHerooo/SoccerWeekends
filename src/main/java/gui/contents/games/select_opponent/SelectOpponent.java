@@ -1,6 +1,6 @@
 package gui.contents.games.select_opponent;
 
-import javafx.JavaFXUtils;
+import javafx_utils.JavaFXUtils;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;

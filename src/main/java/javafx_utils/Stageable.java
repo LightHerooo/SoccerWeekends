@@ -1,4 +1,4 @@
-package javafx;
+package javafx_utils;
 
 import javafx.stage.Stage;
 

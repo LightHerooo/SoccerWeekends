@@ -1,7 +1,7 @@
 package gui.contents.game_types.game_type;
 
 import db.tables.game_type.DBGameTypeItem;
-import javafx.JavaFXUtils;
+import javafx_utils.JavaFXUtils;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;

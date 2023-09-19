@@ -2,7 +2,7 @@ package gui.contents.game_types.game_type;
 
 import db.tables.game_type.DBGameTypeItem;
 import folders.GameTypeImagesFolder;
-import javafx.FXMLController;
+import javafx_utils.FXMLController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -15,6 +15,7 @@ import javafx.scene.layout.Pane;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -36,14 +37,18 @@ public class GameTypeController implements Initializable, FXMLController {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         GameTypeImagesFolder gtif = new GameTypeImagesFolder();
         File file = gtif.findFile(dbGameTypeItem.getImageName().getValue());
-        if (!file.exists()) {
-            file = gtif.getDefaultFile();
-        }
-
-        try (FileInputStream fis = new FileInputStream(file);) {
-            ivAvatar.setImage(new Image(fis));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (file.exists()) {
+            try (FileInputStream fis = new FileInputStream(file);) {
+                ivAvatar.setImage(new Image(fis));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            try (InputStream is = gtif.getDefaultResource();) {
+                ivAvatar.setImage(new Image(is));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         lbTitle.setText(dbGameTypeItem.getTitle().getValue());

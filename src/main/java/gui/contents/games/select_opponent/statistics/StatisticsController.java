@@ -4,7 +4,7 @@ import db.DBConnect;
 import db.DBProcedures;
 import db.tables.opponent.DBOpponentItem;
 import folders.OpponentImagesFolder;
-import javafx.FXMLController;
+import javafx_utils.FXMLController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -17,6 +17,7 @@ import javafx.scene.layout.Pane;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -51,15 +52,19 @@ public class StatisticsController implements Initializable, FXMLController {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         OpponentImagesFolder oif = new OpponentImagesFolder();
         File imgFile = oif.findFile(dbOpponentItem.getImageName().getValue());
-        if (!imgFile.exists()) {
-            imgFile = oif.getDefaultFile();
-        }
-
-        try (FileInputStream fis = new FileInputStream(imgFile)) {
-            Image img = new Image(fis);
-            ivAvatar.setImage(img);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (imgFile.exists()) {
+            try (FileInputStream fis = new FileInputStream(imgFile)) {
+                Image img = new Image(fis);
+                ivAvatar.setImage(img);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            try (InputStream is = oif.getDefaultResource();) {
+                ivAvatar.setImage(new Image(is));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         lbName.setText(dbOpponentItem.getName().getValue());

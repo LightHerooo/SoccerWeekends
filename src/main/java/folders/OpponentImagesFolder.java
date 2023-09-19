@@ -1,8 +1,6 @@
 package folders;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.io.InputStream;
 
 public class OpponentImagesFolder extends Folder {
     public OpponentImagesFolder() {
@@ -10,8 +8,9 @@ public class OpponentImagesFolder extends Folder {
     }
 
     @Override
-    public File getDefaultFile() {
-        URL resource = getClass().getClassLoader().getResource("images/opponent/unknown.png");
+    public InputStream getDefaultResource() {
+        return getClass().getResourceAsStream("/images/opponent/unknown.png");
+        /*URL resource = getClass().getResource("/images/opponent/unknown.png");
         File file = null;
         try {
             file = new File(resource.toURI());
@@ -19,6 +18,6 @@ public class OpponentImagesFolder extends Folder {
             throw new RuntimeException(e);
         }
 
-        return file;
+        return file;*/
     }
 }

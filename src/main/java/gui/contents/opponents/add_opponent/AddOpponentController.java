@@ -4,8 +4,8 @@ import db.DBConnect;
 import db.tables.opponent.DBOpponent;
 import db.tables.opponent.DBOpponentItem;
 import folders.OpponentImagesFolder;
-import javafx.FXMLController;
-import javafx.Stageable;
+import javafx_utils.FXMLController;
+import javafx_utils.Stageable;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -26,6 +26,7 @@ import utils.StringGenerator;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -57,14 +58,18 @@ public class AddOpponentController implements Initializable, FXMLController, Sta
     public void initialize(URL url, ResourceBundle resourceBundle) {
         OpponentImagesFolder oif = new OpponentImagesFolder();
         File file = oif.findFile(dbOpponentItem.getImageName().getValue());
-        if (!file.exists()) {
-            file = oif.getDefaultFile();
-        }
-
-        try (FileInputStream fis = new FileInputStream(file)) {
-            ivAvatar.setImage(new Image(fis));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (file.exists()) {
+            try (FileInputStream fis = new FileInputStream(file)) {
+                ivAvatar.setImage(new Image(fis));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            try (InputStream is = oif.getDefaultResource()) {
+                ivAvatar.setImage(new Image(is));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         if (dbOpponentItem.getIdOpponent().getValue() != null) {

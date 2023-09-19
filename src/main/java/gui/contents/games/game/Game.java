@@ -1,7 +1,7 @@
 package gui.contents.games.game;
 
 import db.tables.game.DBGameItem;
-import javafx.JavaFXUtils;
+import javafx_utils.JavaFXUtils;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;

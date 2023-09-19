@@ -1,7 +1,7 @@
 package gui.contents.games.add_game.opponent_game_result;
 
 import db.tables.game_result.DBGameResultItem;
-import javafx.JavaFXUtils;
+import javafx_utils.JavaFXUtils;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;

@@ -1,9 +1,6 @@
 package folders;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 public abstract class Folder {
     private String path;
@@ -51,5 +48,5 @@ public abstract class Folder {
         }
     }
 
-    public abstract File getDefaultFile();
+    public abstract InputStream getDefaultResource();
 }

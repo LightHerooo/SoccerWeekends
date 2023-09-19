@@ -1,8 +1,8 @@
 package gui.contents;
 
 import gui.MainController;
-import javafx.FXMLController;
-import javafx.JavaFXUtils;
+import javafx_utils.FXMLController;
+import javafx_utils.JavaFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

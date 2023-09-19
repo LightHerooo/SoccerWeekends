@@ -5,7 +5,7 @@ import db.tables.opponent.DBOpponent;
 import db.tables.opponent.DBOpponentItem;
 import gui.contents.opponents.add_opponent.AddOpponentController;
 import gui.contents.opponents.opponent.Opponent;
-import javafx.FXMLController;
+import javafx_utils.FXMLController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
