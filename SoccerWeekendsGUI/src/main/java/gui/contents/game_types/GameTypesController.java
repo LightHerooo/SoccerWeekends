@@ -5,7 +5,6 @@ import db.tables.game_type.DBGameType;
 import db.tables.game_type.DBGameTypeItem;
 import gui.contents.game_types.add_game_type.AddGameTypeController;
 import gui.contents.game_types.game_type.GameType;
-import javafx_utils.FXMLController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,6 +14,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx_utils.FXMLController;
 
 import java.io.IOException;
 import java.net.URL;

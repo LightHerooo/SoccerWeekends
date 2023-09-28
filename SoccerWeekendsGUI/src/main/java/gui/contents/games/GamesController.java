@@ -9,7 +9,6 @@ import db.tables.opponent.DBOpponentItem;
 import gui.contents.games.add_game.AddGameController;
 import gui.contents.games.game.Game;
 import gui.contents.games.select_opponent.SelectOpponent;
-import javafx_utils.FXMLController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,6 +21,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx_utils.FXMLController;
 import utils.CustomAlerts;
 
 import java.io.IOException;

@@ -11,7 +11,7 @@ public final class MainApplication extends Application {
     public void start(Stage stage) throws Exception {
         stage.setWidth(1200);
         stage.setHeight(800);
-        stage.setTitle("SoccerWeekends (development)");
+        stage.setTitle("SoccerWeekends (v.1.0)");
 
         MainController msc = new MainController();
         Parent p = msc.getLoader().load(); // Прогружаем FXML

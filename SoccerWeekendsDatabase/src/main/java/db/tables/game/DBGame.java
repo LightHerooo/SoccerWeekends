@@ -5,9 +5,11 @@ import db.table.DBColumn;
 import db.table.DBTable;
 import db.table.DBTableItem;
 import db.table.DbColumnValue;
-import db.tables.opponent.DBOpponentItem;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
